@@ -8,15 +8,6 @@ import android.provider.BaseColumns;
 
 public class InventoryContract {
 
-	public static final String COMMA = ",";
-	public static final String TYPE_INTEGER = " INTEGER ";
-	public static final String TYPE_TEXT = " TEXT ";
-	public static final String TYPE_BLOB = " BLOB ";
-
-	public static final String CONSTRAINT_PRIMARY_KEY = " PRIMARY KEY ";
-	public static final String CONSTRAINT_NOT_NULL = " NOT NULL ";
-
-	public static final String KEY_AUTOINCREMENT = "AUTOINCREMENT";
 
 	private InventoryContract() {
 	}
