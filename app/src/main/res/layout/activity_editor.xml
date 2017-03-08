@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:id="@+id/activity_editor"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:padding="16dp">
+
+		<LinearLayout
+			android:id="@+id/layout_name"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/text_view_name"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:paddingBottom="8dp"
+				android:paddingTop="8dp"
+				android:text="@string/name_title"
+				android:textAppearance="?android:textAppearanceMedium"/>
+
+			<EditText
+				android:id="@+id/edit_text_name"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:inputType="text"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@+id/layout_price"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/text_view_price"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:paddingBottom="8dp"
+				android:paddingTop="8dp"
+				android:text="@string/price_title"
+				android:textAppearance="?android:textAppearanceMedium"/>
+
+			<EditText
+				android:id="@+id/edit_text_price"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:inputType="numberDecimal"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@+id/layout_quantity"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/text_view_quantity"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:paddingBottom="8dp"
+				android:paddingTop="8dp"
+				android:text="@string/quantity_title"
+				android:textAppearance="?android:textAppearanceMedium"/>
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center">
+
+				<ImageButton
+					android:id="@+id/image_button_quantity_minus"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center"
+					android:layout_weight="1"
+					android:background="@null"
+					android:scaleType="fitEnd"
+					android:src="@drawable/selector_quantity_minus"/>
+
+				<EditText
+					android:id="@+id/edit_text_quantity"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center"
+					android:layout_weight="1"
+					android:gravity="center"
+					android:inputType="numberSigned"/>
+
+				<ImageButton
+					android:id="@+id/image_button_quantity_plus"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center"
+					android:layout_weight="1"
+					android:background="@null"
+					android:scaleType="fitStart"
+					android:src="@drawable/selector_quantity_plus"/>
+			</LinearLayout>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:id="@+id/layout_supplier"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/text_view_supplier"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:paddingBottom="8dp"
+				android:paddingTop="8dp"
+				android:text="@string/supplier_title"
+				android:textAppearance="?android:textAppearanceMedium"/>
+
+			<EditText
+				android:id="@+id/edit_text_supplier"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:inputType="text"/>
+		</LinearLayout>
+	</LinearLayout>
+</ScrollView>

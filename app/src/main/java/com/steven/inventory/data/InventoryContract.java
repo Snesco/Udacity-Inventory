@@ -8,7 +8,6 @@ import android.provider.BaseColumns;
 
 public class InventoryContract {
 
-
 	private InventoryContract() {
 	}
 
@@ -19,7 +18,17 @@ public class InventoryContract {
 		public static final String COLUMN_NAME_TITLE = "title";
 		public static final String COLUMN_NAME_PRICE = "price";
 		public static final String COLUMN_NAME_QUANTITY = "quantity";
-		public static final String COLUMN_NAME_IMAGE = "image";
 		public static final String COLUMN_NAME_SUPPLIER = "supplier";
+
+		static final String SQL_CREATE_TABLE =
+			"CREATE TABLE " + TABLE_NAME + " ("
+				+ _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+				+ COLUMN_NAME_TITLE + " TEXT NOT NULL, "
+				+ COLUMN_NAME_PRICE + " REAL DEFAULT 0, "
+				+ COLUMN_NAME_QUANTITY + " INTEGER DEFAULT 1, "
+				+ COLUMN_NAME_SUPPLIER + " TEXT)";
+
+		static final String SQL_DELETE_TABLE =
+			"DROP TABLE IF EXISTS " + TABLE_NAME;
 	}
 }
