@@ -11,6 +11,7 @@
 	<string name="list_delete_all_positive">Delete</string>
 	<string name="list_delete_all_negative">Cancel</string>
 	<string name="menu_add_title">Add</string>
+	<string name="menu_delete_title">Delete</string>
 	<string name="menu_delete_all_title">Delete All</string>
 
 </resources>

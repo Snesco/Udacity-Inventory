@@ -8,4 +8,8 @@
 		android:icon="@drawable/ic_done_white_48dp"
 		android:title="@string/menu_add_title"
 		app:showAsAction="always"/>
+	<item
+		android:id="@+id/menu_delete"
+		android:title="@string/menu_delete_title"
+		app:showAsAction="never"/>
 </menu>

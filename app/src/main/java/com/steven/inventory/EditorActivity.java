@@ -99,12 +99,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 		switch (item.getItemId()) {
 			case R.id.menu_done:
 				saveProduct();
+				break;
+			case R.id.menu_delete:
+				deleteProduct();
 		}
 		return true;
 	}
 
 	private void saveProduct() {
-
 
 		String name = nameEditText.getText().toString().trim();
 		String quantityString = quantityEditText.getText().toString().trim();
@@ -142,6 +144,19 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 		}
 	}
 
+	private void deleteProduct() {
+
+		if (uri != null) {
+			int rowsDeleted = getContentResolver().delete(uri, null, null);
+			if (rowsDeleted == 0) {
+				Toast.makeText(this, "deleting item failed", Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(this, "Item deleted", Toast.LENGTH_SHORT).show();
+				finish();
+			}
+		}
+	}
+
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 		return new CursorLoader(this, uri, null, null, null, null);
@@ -149,6 +164,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+		if (data == null || data.getCount() < 1) return;
 
 		data.moveToFirst();
 
