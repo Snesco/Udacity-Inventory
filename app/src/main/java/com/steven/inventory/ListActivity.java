@@ -1,9 +1,12 @@
 package com.steven.inventory;
 
+import android.app.LoaderManager;
+import android.content.ContentUris;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,15 +17,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.steven.inventory.data.InventoryDbHelper;
 import com.steven.inventory.data.InventoryContract.InventoryEntry;
 
-import java.util.ArrayList;
+public class ListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-public class ListActivity extends AppCompatActivity {
-
-	private InventoryDbHelper inventoryDbHelper;
-	private InventoryAdapter inventoryAdapter;
+	private InventoryCursorAdapter inventoryCursorAdapter;
 
 	private final static String LOG_TAG = ListActivity.class.getName();
 
@@ -31,9 +30,8 @@ public class ListActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_list);
 
-		inventoryAdapter = new InventoryAdapter(this);
+		inventoryCursorAdapter = new InventoryCursorAdapter(this, null);
 
-		inventoryDbHelper = new InventoryDbHelper(this);
 		ListView listView = (ListView) findViewById(R.id.list);
 		FloatingActionButton addFAB = (FloatingActionButton) findViewById(R.id.fab_add);
 		addFAB.setOnClickListener(new View.OnClickListener() {
@@ -47,18 +45,12 @@ public class ListActivity extends AppCompatActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent i = new Intent(ListActivity.this, EditorActivity.class);
-				i.putExtra("id", inventoryAdapter.getItem(position).getId());
+				i.setData(ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, id));
 				startActivity(i);
 			}
 		});
-		listView.setAdapter(inventoryAdapter);
-		displayInventory();
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-		displayInventory();
+		listView.setAdapter(inventoryCursorAdapter);
+		getLoaderManager().initLoader(1, null, this);
 	}
 
 	@Override
@@ -76,53 +68,8 @@ public class ListActivity extends AppCompatActivity {
 		return true;
 	}
 
-	private void displayInventory() {
-		inventoryAdapter.clear();
-
-		SQLiteDatabase db = inventoryDbHelper.getReadableDatabase();
-
-		ArrayList<Product> productArrayList = new ArrayList<>();
-
-		Cursor cursor = db.query(InventoryEntry.TABLE_NAME,
-			null,
-			null,
-			null,
-			null,
-			null,
-			InventoryEntry._ID + " DESC");
-
-		while (cursor.moveToNext()) {
-			int idColumnIndex = cursor.getColumnIndex(InventoryEntry._ID);
-			int nameColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_NAME_TITLE);
-			int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_NAME_PRICE);
-			int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_NAME_QUANTITY);
-			int supplierColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_NAME_SUPPLIER);
-
-			int productId = cursor.getInt(idColumnIndex);
-			String productName = cursor.getString(nameColumnIndex);
-			float productPrice = cursor.getFloat(priceColumnIndex);
-			int productQuantity = cursor.getInt(quantityColumnIndex);
-			String productSupplier = cursor.getString(supplierColumnIndex);
-
-			Product newProduct = new Product(productId,
-				productName,
-				productPrice,
-				productQuantity,
-				productSupplier);
-
-			productArrayList.add(newProduct);
-		}
-
-		cursor.close();
-		db.close();
-		inventoryAdapter.addAll(productArrayList);
-	}
-
 	private void deleteAll() {
-		SQLiteDatabase db = inventoryDbHelper.getWritableDatabase();
-		db.delete(InventoryEntry.TABLE_NAME, null, null);
-		db.close();
-		displayInventory();
+		getContentResolver().delete(InventoryEntry.CONTENT_URI, null, null);
 	}
 
 	private void showDeleteAllConfirmationDialog() {
@@ -149,5 +96,26 @@ public class ListActivity extends AppCompatActivity {
 
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		alertDialog.show();
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		return new CursorLoader(this,
+			InventoryEntry.CONTENT_URI,
+			null,
+			null,
+			null,
+			null);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+		inventoryCursorAdapter.swapCursor(data);
+
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		inventoryCursorAdapter.swapCursor(null);
 	}
 }

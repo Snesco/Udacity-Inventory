@@ -1,8 +1,11 @@
 package com.steven.inventory;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -14,26 +17,23 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.steven.inventory.data.InventoryContract.InventoryEntry;
-import com.steven.inventory.data.InventoryDbHelper;
 
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	private final static String LOG_TAG = EditorActivity.class.getName();
 
-	private InventoryDbHelper inventoryDbHelper;
 	private EditText nameEditText;
 	private EditText priceEditText;
 	private EditText quantityEditText;
 	private EditText supplierEditText;
 
-	private int id;
+	private Uri uri;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_editor);
 
-		inventoryDbHelper = new InventoryDbHelper(this);
 
 		nameEditText = (EditText) findViewById(R.id.edit_text_name);
 		priceEditText = (EditText) findViewById(R.id.edit_text_price);
@@ -42,14 +42,14 @@ public class EditorActivity extends AppCompatActivity {
 		quantityEditText.setText(String.valueOf(1));
 		supplierEditText = (EditText) findViewById(R.id.edit_text_supplier);
 
-		id = getIntent().getIntExtra("id", -1);
+		uri = getIntent().getData();
 
 
-		if (id != -1) {
+		if (uri != null) {
 			setTitle(R.string.edit_activity_title);
-			getProductDetails(id);
 			nameEditText.setEnabled(false);
 			supplierEditText.setEnabled(false);
+			getLoaderManager().initLoader(2, null, this);
 		} else {
 			setTitle(R.string.add_activity_title);
 		}
@@ -105,7 +105,6 @@ public class EditorActivity extends AppCompatActivity {
 
 	private void saveProduct() {
 
-		SQLiteDatabase db = inventoryDbHelper.getWritableDatabase();
 
 		String name = nameEditText.getText().toString().trim();
 		String quantityString = quantityEditText.getText().toString().trim();
@@ -122,22 +121,18 @@ public class EditorActivity extends AppCompatActivity {
 		contentValues.put(InventoryEntry.COLUMN_NAME_QUANTITY, quantity);
 		contentValues.put(InventoryEntry.COLUMN_NAME_SUPPLIER, supplier);
 
-		if (id == -1) {
-			long newRowId = db.insert(InventoryEntry.TABLE_NAME,
-				null,
-				contentValues);
+		if (uri == null) {
+			Uri newRowUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, contentValues);
 
-			if (newRowId < 0) {
+			if (newRowUri == null) {
 				Toast.makeText(this, "Adding item failed", Toast.LENGTH_SHORT).show();
 			} else {
 				Toast.makeText(this, "Item added", Toast.LENGTH_SHORT).show();
 				finish();
 			}
 		} else {
-			int rowsAffected = db.update(InventoryEntry.TABLE_NAME,
-				contentValues,
-				InventoryEntry._ID + "=?",
-				new String[]{String.valueOf(id)});
+			int rowsAffected = getContentResolver().update(uri, contentValues, null, null);
+
 			if (rowsAffected == 0) {
 				Toast.makeText(this, "Editing item failed", Toast.LENGTH_SHORT).show();
 			} else {
@@ -145,37 +140,37 @@ public class EditorActivity extends AppCompatActivity {
 				finish();
 			}
 		}
-		db.close();
 	}
 
-	private void getProductDetails(int id) {
-		SQLiteDatabase db = inventoryDbHelper.getReadableDatabase();
-		Cursor cursor = db.query(InventoryEntry.TABLE_NAME,
-			null,
-			InventoryEntry._ID + "=?",
-			new String[]{String.valueOf(id)},
-			null,
-			null,
-			null);
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		return new CursorLoader(this, uri, null, null, null, null);
+	}
 
-		cursor.moveToNext();
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-		int nameColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_NAME_TITLE);
-		int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_NAME_PRICE);
-		int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_NAME_QUANTITY);
-		int supplierColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_NAME_SUPPLIER);
+		data.moveToFirst();
 
-		String productName = cursor.getString(nameColumnIndex);
-		float productPrice = cursor.getFloat(priceColumnIndex);
-		int productQuantity = cursor.getInt(quantityColumnIndex);
-		String productSupplier = cursor.getString(supplierColumnIndex);
+		int nameColumnIndex = data.getColumnIndex(InventoryEntry.COLUMN_NAME_TITLE);
+		int priceColumnIndex = data.getColumnIndex(InventoryEntry.COLUMN_NAME_PRICE);
+		int quantityColumnIndex = data.getColumnIndex(InventoryEntry.COLUMN_NAME_QUANTITY);
+		int supplierColumnIndex = data.getColumnIndex(InventoryEntry.COLUMN_NAME_SUPPLIER);
+
+		String productName = data.getString(nameColumnIndex);
+		float productPrice = data.getFloat(priceColumnIndex);
+		int productQuantity = data.getInt(quantityColumnIndex);
+		String productSupplier = data.getString(supplierColumnIndex);
 
 		nameEditText.setText(productName);
 		priceEditText.setText(String.valueOf(productPrice));
 		quantityEditText.setText(String.valueOf(productQuantity));
 		supplierEditText.setText(productSupplier);
 
-		cursor.close();
-		db.close();
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+
 	}
 }

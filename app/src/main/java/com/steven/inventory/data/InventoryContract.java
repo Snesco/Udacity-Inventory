@@ -1,5 +1,6 @@
 package com.steven.inventory.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
@@ -8,12 +9,17 @@ import android.provider.BaseColumns;
 
 public class InventoryContract {
 
+	public static final String CONTENT_AUTHORITY = "com.steven.inventory.provider";
+	public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
 	private InventoryContract() {
 	}
 
 	public static class InventoryEntry implements BaseColumns {
 
 		public static final String TABLE_NAME = "inventory";
+
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, TABLE_NAME);
 
 		public static final String COLUMN_NAME_TITLE = "title";
 		public static final String COLUMN_NAME_PRICE = "price";
